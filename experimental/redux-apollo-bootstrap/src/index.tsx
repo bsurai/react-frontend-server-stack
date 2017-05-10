@@ -76,7 +76,7 @@ function bootstrap(options: interfaces.BoostrapOptions): interfaces.BootstrapRes
     //     }
     // };
     const storeOptions: StoreOptions = {
-        platformMiddleware: [...middlewares, immutableStateInvariant, client.middleware()],
+        platformMiddleware: [...middlewares, immutableStateInvariant(), client.middleware()],
         platformReducers: reducers,
         initialState,
         // platformStoreEnhancers: [devToolsOptions]
