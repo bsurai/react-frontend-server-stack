@@ -30,23 +30,38 @@ const fetchLogin = (service: string) => ({ dispatch }) => {//(service: string) =
 
     return (dispatch) => {
 
+        let options = {
+            method: 'POST',
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json'
+            }/*,
+            body: JSON.stringify({
+                email: 'foo',
+                pass: 'bar'
+            })*/
+        };
+
         dispatch(loginBegin());
-        return fetch("http://localhost:4000/auth/" + service)
+        return fetch("http://localhost:4000/auth/" + service, options)
             .then(response => {
                 console.log(`response.status ${response.status}`);
+                console.log(response);
                 if (response.status >= 400) {
                     dispatch(loginError());
                     return;
                 };
                 console.log(`response ${response}`);
-                response.json();
+                return response.json();
             })
             .then(json => {
                 console.log(`parsed data ${json}`);
+                console.log(json);
                 dispatch(loginSuccess(json));
             })
             .catch(error => {
                 console.log(`request failed ${error}`);
+                console.log(error);
                 dispatch(loginError());
             });
     };
