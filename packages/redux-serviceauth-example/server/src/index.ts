@@ -1,36 +1,27 @@
-import * as Express from "express";
 import * as bodyParser from "body-parser";
+import * as cookieParser from "cookie-parser";
 import * as core from "express-serve-static-core";
+import * as Express from "express";
 import * as path from "path";
 import * as cors from "cors";
+import auth from "./auth";
+import ports from "./constants/ports";
 
-const PORT = 4000;
-const app: core.Express = Express();
+let { PORT_SERVER, PORT_CLIENT } = ports;
+const app: Express.Application = Express();
 const optionsUrlencoded: bodyParser.OptionsUrlencoded = { extended: false };
 
-app.use('*', cors({ origin: 'http://localhost:8080' }));
-app.use(bodyParser.urlencoded(optionsUrlencoded));
-//app.use(bodyParser.json());
+app.use('*', cors({ origin: 'http://localhost:'+PORT_CLIENT }));
 
-app.post("/auth/:service", (req: core.Request, res: core.Response) => {
-    let service: string = req.params.service || "";
+app.use(cookieParser());
+app.use(bodyParser.urlencoded({ extended: true }));
+app.use(bodyParser.json());
 
-    console.log("service=" + service);
-    res.status(200)
-    res.json({ user: "Me", service });
-    // res.end();
-    /*if (url && !db.customerUrlExist(url)) {
-        let err: string = "URL \"" + url.toUpperCase() + "\" does not exist. Please enter other one.";
-        res.setHeader("Content-Type", "text/plain");
-        res.send(400, err);
-        return;
-    };
-    res.redirect(303, "/" + url + "/projects");*/
-});
+auth.set(app);
 
 
-
-app.listen(process.env.PORT || PORT, () => {
-    let p = process.env.PORT || PORT;
-    console.log("Running port " + p);
+let port = process.env.PORT || PORT_SERVER;
+app.listen(port, () => {
+    
+    console.log("Running port " + port);
 });
