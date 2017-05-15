@@ -2,6 +2,9 @@ import * as fetch from 'isomorphic-fetch';
 import ACTION_TYPES from "../constants/action_types";
 import * as I from "../interfaces";
 
+type RequestCredentials = "omit" | "same-origin" | "include";
+const credentials: RequestCredentials = "include";
+
 const loginBegin: I.IActionCreatorSync = () => {
 
     console.log("loginBegin");
@@ -26,37 +29,36 @@ const loginError: I.IActionCreatorSync = () => {
     }
 };
 
-const fetchLogin = (service: string) => ({ dispatch }) => {//(service: string) => {
+const fetchLogin = () => ({ dispatch }) => {//(service: string) => {
 
     return (dispatch) => {
-
         let options = {
-            method: 'POST',
+            method: 'GET',
             headers: {
                 'Accept': 'application/json',
-                'Content-Type': 'application/json'
-            }/*,
-            body: JSON.stringify({
-                email: 'foo',
-                pass: 'bar'
-            })*/
+                'Content-Type': 'application/json',
+                'Cache': 'no-cache'
+            },
+            credentials
         };
 
         dispatch(loginBegin());
-        return fetch("http://localhost:4000/auth/" + service, options)
+        return fetch("http://localhost:4000/auth/login", options)
             .then(response => {
                 console.log(`response.status ${response.status}`);
-                console.log(response);
+                console.log('response\'s headers');
+                response.headers.forEach((item) => console.log(item));
+
                 if (response.status >= 400) {
                     dispatch(loginError());
                     return;
                 };
-                console.log(`response ${response}`);
                 return response.json();
             })
             .then(json => {
                 console.log(`parsed data ${json}`);
                 console.log(json);
+                if (!json) return;
                 dispatch(loginSuccess(json));
             })
             .catch(error => {

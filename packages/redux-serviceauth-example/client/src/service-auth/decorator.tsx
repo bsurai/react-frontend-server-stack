@@ -6,25 +6,31 @@ let DefaultComponent: any;
 class ServiceButtons extends React.Component<any, any> {
     public render() {
         return (
-            <div>{
+            <ul>{
                 providers.buttons.map(
-                    (btn, ind) => <btn.component key={ind} fetchLogin={() => { this.props.actionsAuth.fetchLogin(btn.name) }} />
+                    (btn, ind) => <li key={ind}><btn.component name={btn.name} /></li>
                 )
-            }</div>
+            }</ul>
         )
     }
 };
 
 export class Wrapped extends React.Component<any, any> {
+
+    componentDidMount() {
+        const { actionsAuth } = this.props;
+        actionsAuth.fetchLogin();
+    }
+
     public render() {
-        let { authentication, actionsAuth } = this.props;
-        let { isAuthenticated } = this.props.authentication;
+        const { authentication: { isAuthenticated } } = this.props;
+        console.log("render isAuthenticated = "+isAuthenticated);
 
         return (
             <div>{
                 isAuthenticated ?
                     <DefaultComponent {...this.props} /> :
-                    <ServiceButtons actionsAuth={actionsAuth} />
+                    <ServiceButtons />
             }</div>
         )
     }

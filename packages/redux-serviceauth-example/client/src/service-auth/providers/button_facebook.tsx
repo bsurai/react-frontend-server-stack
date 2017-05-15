@@ -7,7 +7,7 @@ import { BtnProps } from "../../components/btn_component";
     
     public render() {
 
-        const title = "Connet with Facebook";
+        const title = "Connect with Facebook";
         
         return (
             <Btn clickHandler={this.props.fetchLogin} textLabel={title} />
@@ -18,15 +18,17 @@ import { BtnProps } from "../../components/btn_component";
 class ButtonFacebook extends React.Component<any, any> {
 
     public render() {
-
-        const title = "Connect with Facebook";
+        const { name } = this.props;        
+        const title = "Connect with "+name;
+        
+        
         const style = {
             appearance: 'button',
             decoration: 'none',
             color: 'initial',
         };
     return(
-            <a href={"http://localhost:4000/auth/facebook"} style={style}>{title}</a>
+            <a href={"http://localhost:4000/auth/"+name} style={style}>{title}</a>
         );
     }
 }

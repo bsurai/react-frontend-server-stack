@@ -11,7 +11,7 @@ let { PORT_SERVER, PORT_CLIENT } = ports;
 const app: Express.Application = Express();
 const optionsUrlencoded: bodyParser.OptionsUrlencoded = { extended: false };
 
-app.use('*', cors({ origin: 'http://localhost:'+PORT_CLIENT }));
+app.use('*', cors({ origin: 'http://localhost:'+PORT_CLIENT, credentials: true }));
 
 app.use(cookieParser());
 app.use(bodyParser.urlencoded({ extended: true }));
