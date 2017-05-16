@@ -19,6 +19,15 @@ app.use(bodyParser.json());
 
 auth.set(app);
 
+app.use((err, req, res, next) => {
+    console.log('500 Internal Server Error: ' + err.message);
+    res.send('500 Internal Server Error');
+});
+
+app.use((req, res) => {
+    console.log('404 Not Found');
+    res.send('404 Not Found');
+});
 
 let port = process.env.PORT || PORT_SERVER;
 app.listen(port, () => {

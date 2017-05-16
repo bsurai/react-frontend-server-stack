@@ -1,5 +1,5 @@
 import * as React from "react";
-import providers from "./providers";
+import providers from "./components";
 
 let DefaultComponent: any;
 

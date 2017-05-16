@@ -15,17 +15,19 @@ const authFacebook: Express.Handler = passport.authenticate('facebook', { scope:
 
 const authCallbackFacebook1: Express.Handler = passport.authenticate('facebook', { failureRedirect: '/', session: false });
 
-const authCallbackFacebook2: Express.Handler = (req, res) => {
-    let service: string = req.params.service || "";
-    /*console.log("authCallbackHandlerFacebook2");
-    console.log("callback service=" + service);
-    console.log("req.user=");
-    console.log(req.user);*/
-
+const createToken = (req: Express.Request, res: Express.Response): Express.Response => {
+    console.log(1)
     const expiresIn = 60 * 5; // 5 mins
+    console.log(2)
     const token = jwt.sign(req.user, auth.jwt.secret, { expiresIn });
+    console.log(3)
     res.cookie('id_token', token, { maxAge: 1000 * expiresIn, httpOnly: true });
-    res.redirect('http://localhost:' + PORT_CLIENT+'/repos');
+    console.log(4)
+    return res;
+};
+
+const authCallbackFacebook2: Express.Handler = (req, res) => {
+    createToken(req, res).redirect('http://localhost:' + PORT_CLIENT + '/repos');
 };
 
 passport.use(new FacebookStrategy(auth.facebook,
@@ -42,36 +44,27 @@ const jwtWithOptions = expressJwt({
     secret: auth.jwt.secret,
     credentialsRequired: false,
     getToken: (req) => {
-        console.log("req.cookies.id_token")
-        console.log(req.cookies.id_token)
-        return req.cookies.id_token},
-});// .unless({path:['/auth/facebook', '/auth/facebook/callback']});
+        return req.cookies.id_token
+    },
+});
 
 const authLoginCallback: Express.Handler = (req, res, next): void => {
     // Here you can write user verifying.
     // console.log("req.cookies.id_token")
     // console.log(req.cookies.id_token)
-    console.log("req.user")
-    console.log(req.user)
-    console.log("req.baseUrl")
-    console.log(req.baseUrl)
-    console.log("req.url")
-    console.log(req.url)
 
     if (!req.user) {
         console.log("ERROR /auth/login")
         res.sendStatus(401);
-        // res.status(401).redirect('http://localhost:' + PORT_CLIENT + '/401');
-        //res.redirect('http://localhost:' + PORT_CLIENT + '/401');
         return;
     };
 
-    console.log("SUCCESS /auth/login")
+    console.log("SUCCESS /auth/login");
+    // createToken(req, res).status(200).json(mockUser);
     res.status(200).json(mockUser);
 };
 
 const set = (app: Express.Application): void => {
-    // app.use(jwtWithOptions, authLoginCallback);
     app.use('/auth/login', jwtWithOptions, authLoginCallback);
 
     app.use(passport.initialize());
