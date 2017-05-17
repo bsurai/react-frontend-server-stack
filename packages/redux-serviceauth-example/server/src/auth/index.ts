@@ -1,44 +1,56 @@
 import * as Express from "express";
 import * as expressJwt from "express-jwt";
 import * as jwt from "jsonwebtoken";
-import * as passport from "passport";
-import * as passportFacebook from "passport-facebook";
+import passport from "./passport";
 import ports from "../constants/ports";
 import { auth } from './config';
-
-const mockUser = { user: "me", service: "facebook" };
+import { user as mockUser } from './mockData';
 
 const { PORT_SERVER, PORT_CLIENT } = ports;
-const FacebookStrategy = passportFacebook.Strategy;
 
-const authFacebook: Express.Handler = passport.authenticate('facebook', { scope: ['email', 'user_location'], session: false });
+const authOptions = {
+    facebook: { scope: [], session: false },//{ scope: ['email', 'user_location'], session: false },
+    twitter: { scope: [], session: false },
+    google: {
+        scope: [
+            'https://www.googleapis.com/auth/plus.login',
+            'https://www.googleapis.com/auth/plus.me',
+            'https://www.googleapis.com/auth/userinfo.email'            
+        ],
+        session: false
+    },//{ scope: ['https://www.googleapis.com/auth/plus.login'] },
+};
 
-const authCallbackFacebook1: Express.Handler = passport.authenticate('facebook', { failureRedirect: '/', session: false });
+const authCall = {
+    facebook: passport.authenticate('facebook', authOptions.facebook),
+    twitter: passport.authenticate('twitter', authOptions.twitter),
+    google: passport.authenticate('google', authOptions.google),
+};
+
+const authCallbackOptions = {
+    facebook: { failureRedirect: '/', session: false },
+    twitter: { failureRedirect: '/', session: false },
+    google: { failureRedirect: '/', session: false },
+};
+
+const authCallback = {
+    facebook: passport.authenticate('facebook', authCallbackOptions.facebook),
+    twitter: passport.authenticate('twitter', authCallbackOptions.twitter),
+    google: passport.authenticate('google', authCallbackOptions.google),
+};
 
 const createToken = (req: Express.Request, res: Express.Response): Express.Response => {
-    console.log(1)
     const expiresIn = 60 * 5; // 5 mins
-    console.log(2)
     const token = jwt.sign(req.user, auth.jwt.secret, { expiresIn });
-    console.log(3)
     res.cookie('id_token', token, { maxAge: 1000 * expiresIn, httpOnly: true });
-    console.log(4)
     return res;
 };
 
-const authCallbackFacebook2: Express.Handler = (req, res) => {
+const sendTokenAfterSucceed: Express.Handler = (req, res) => {
+    console.log('authCallback2 - 1')
     createToken(req, res).redirect('http://localhost:' + PORT_CLIENT + '/repos');
+    console.log('authCallback2 - 2')
 };
-
-passport.use(new FacebookStrategy(auth.facebook,
-    (accessToken, refreshToken, profile, done) => {
-        let user = mockUser;
-        //User.findOrCreate(..., function (err, user) {
-        //    if (err) { return done(err); }
-        done(null, user);
-        //});
-    }
-));
 
 const jwtWithOptions = expressJwt({
     secret: auth.jwt.secret,
@@ -50,9 +62,6 @@ const jwtWithOptions = expressJwt({
 
 const authLoginCallback: Express.Handler = (req, res, next): void => {
     // Here you can write user verifying.
-    // console.log("req.cookies.id_token")
-    // console.log(req.cookies.id_token)
-
     if (!req.user) {
         console.log("ERROR /auth/login")
         res.sendStatus(401);
@@ -66,11 +75,15 @@ const authLoginCallback: Express.Handler = (req, res, next): void => {
 
 const set = (app: Express.Application): void => {
     app.use('/auth/login', jwtWithOptions, authLoginCallback);
-
     app.use(passport.initialize());
-
-    app.get('/auth/facebook', authFacebook);
-    app.get('/auth/:service/callback', authCallbackFacebook1, authCallbackFacebook2);
+    app.get('/auth/facebook', authCall.facebook);
+    app.get('/auth/google', authCall.google);
+    app.get('/auth/twitter', authCall.twitter);
+    // app.get('/auth/github', authGithub);
+    app.get('/auth/facebook/callback', authCallback.facebook, sendTokenAfterSucceed);
+    app.get('/auth/google/callback', authCallback.google, sendTokenAfterSucceed);
+    app.get('/auth/twitter/callback', authCallback.twitter, sendTokenAfterSucceed);
+    // app.get('/auth/github/callback', authCallbackGithub1, sendTokenAfterSucceed);
 };
 
 export default {

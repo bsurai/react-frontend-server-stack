@@ -21,11 +21,15 @@ auth.set(app);
 
 app.use((err, req, res, next) => {
     console.log('500 Internal Server Error: ' + err.message);
+    console.log('url='+req.url)
+    console.log('baseUrl='+req.baseUrl);
     res.send('500 Internal Server Error');
 });
 
 app.use((req, res) => {
     console.log('404 Not Found');
+    console.log('url='+req.url)
+    console.log('baseUrl='+req.baseUrl);
     res.send('404 Not Found');
 });
 
