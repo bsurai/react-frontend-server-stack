@@ -39,3 +39,22 @@ export const auth: IAuth = {
     callbackURL: "/auth/twitter/callback"
   },
 };
+
+export const authOptions = {
+    facebook: { scope: ['email', 'user_location'], session: false },
+    twitter: { scope: [], session: false },
+    google: {
+        scope: [
+            'https://www.googleapis.com/auth/plus.login',
+            'https://www.googleapis.com/auth/plus.me',
+            'https://www.googleapis.com/auth/userinfo.email'
+        ],
+        session: false
+    },
+};
+
+export const authCallbackOptions = {
+    facebook: { failureRedirect: '/', session: false },
+    twitter: { failureRedirect: '/', session: false },
+    google: { failureRedirect: '/', session: false },
+};

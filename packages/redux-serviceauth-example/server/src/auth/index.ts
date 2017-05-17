@@ -3,40 +3,19 @@ import * as expressJwt from "express-jwt";
 import * as jwt from "jsonwebtoken";
 import passport from "./passport";
 import ports from "../constants/ports";
-import { auth } from './config';
+import { auth, authOptions, authCallbackOptions } from './config';
 import { user as mockUser } from './mockData';
 
 const { PORT_SERVER, PORT_CLIENT } = ports;
 
-const authOptions = {
-    facebook: { scope: [], session: false },//{ scope: ['email', 'user_location'], session: false },
-    twitter: { scope: [], session: false },
-    google: {
-        scope: [
-            'https://www.googleapis.com/auth/plus.login',
-            'https://www.googleapis.com/auth/plus.me',
-            'https://www.googleapis.com/auth/userinfo.email'            
-        ],
-        session: false
-    },//{ scope: ['https://www.googleapis.com/auth/plus.login'] },
+const authCall = (req, res, next) => {
+    let { provider } = req.params;
+    passport.authenticate(provider, authOptions[provider])(req, res, next);
 };
 
-const authCall = {
-    facebook: passport.authenticate('facebook', authOptions.facebook),
-    twitter: passport.authenticate('twitter', authOptions.twitter),
-    google: passport.authenticate('google', authOptions.google),
-};
-
-const authCallbackOptions = {
-    facebook: { failureRedirect: '/', session: false },
-    twitter: { failureRedirect: '/', session: false },
-    google: { failureRedirect: '/', session: false },
-};
-
-const authCallback = {
-    facebook: passport.authenticate('facebook', authCallbackOptions.facebook),
-    twitter: passport.authenticate('twitter', authCallbackOptions.twitter),
-    google: passport.authenticate('google', authCallbackOptions.google),
+const authCallback = (req, res, next) => {
+    let { provider } = req.params;
+    passport.authenticate(provider, authCallbackOptions[provider])(req, res, next);
 };
 
 const createToken = (req: Express.Request, res: Express.Response): Express.Response => {
@@ -47,9 +26,7 @@ const createToken = (req: Express.Request, res: Express.Response): Express.Respo
 };
 
 const sendTokenAfterSucceed: Express.Handler = (req, res) => {
-    console.log('authCallback2 - 1')
     createToken(req, res).redirect('http://localhost:' + PORT_CLIENT + '/repos');
-    console.log('authCallback2 - 2')
 };
 
 const jwtWithOptions = expressJwt({
@@ -76,14 +53,8 @@ const authLoginCallback: Express.Handler = (req, res, next): void => {
 const set = (app: Express.Application): void => {
     app.use('/auth/login', jwtWithOptions, authLoginCallback);
     app.use(passport.initialize());
-    app.get('/auth/facebook', authCall.facebook);
-    app.get('/auth/google', authCall.google);
-    app.get('/auth/twitter', authCall.twitter);
-    // app.get('/auth/github', authGithub);
-    app.get('/auth/facebook/callback', authCallback.facebook, sendTokenAfterSucceed);
-    app.get('/auth/google/callback', authCallback.google, sendTokenAfterSucceed);
-    app.get('/auth/twitter/callback', authCallback.twitter, sendTokenAfterSucceed);
-    // app.get('/auth/github/callback', authCallbackGithub1, sendTokenAfterSucceed);
+    app.get('/auth/:provider', authCall);
+    app.get('/auth/:provider/callback', authCallback, sendTokenAfterSucceed);
 };
 
 export default {
