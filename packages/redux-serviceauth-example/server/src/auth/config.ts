@@ -24,12 +24,11 @@ export const auth: IAuth = {
     clientSecret: process.env.GOOGLE_CLIENT_SECRET || '',
     callbackURL: "/auth/github/callback"
   },
-
   // https://cloud.google.com/console/project
   // or https://developers.google.com/identity/sign-in/web/devconsole-project
   google: {
     clientID: process.env.GOOGLE_CLIENT_ID || '437771450296-0dot4auqqupasfom6b3p55is51kl2r8k.apps.googleusercontent.com',
-    clientSecret: process.env.GOOGLE_CLIENT_SECRET || 'M8ebgQCELUwPKg8q8sRKaiYi',
+    clientSecret: process.env.GOOGLE_CLIENT_SECRET || 'M8ebgQCELUwPKg8q8sRKaiYi', 
     callbackURL: "/auth/google/callback"
   },
 
