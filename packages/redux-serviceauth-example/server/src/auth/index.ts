@@ -10,6 +10,7 @@ const { PORT_SERVER, PORT_CLIENT } = ports;
 
 const authCall = (req, res, next) => {
     let { provider } = req.params;
+    console.log("authCall "+provider);
     passport.authenticate(provider, authOptions[provider])(req, res, next);
 };
 

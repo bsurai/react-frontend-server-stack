@@ -34,15 +34,15 @@ export const auth: IAuth = {
 
   // https://apps.twitter.com/
   twitter: {
-    consumerKey: process.env.TWITTER_CONSUMER_KEY || 'Ie20AZvLJI2lQD5Dsgxgjauns',
-    consumerSecret: process.env.TWITTER_CONSUMER_SECRET || 'KTZ6cxoKnEakQCeSpZlaUCJWGAlTEBJj0y2EMkUBujA7zWSvaQ',
+    consumerKey: process.env.TWITTER_CONSUMER_KEY || 'UZ6kHY378IufjM6aMOxKIhygc',
+    consumerSecret: process.env.TWITTER_CONSUMER_SECRET || 'Yk05YtqRb0lUtIDxJjLNbDxVOJ3ojHtYyiuwLahPenxpgEvtig',
     callbackURL: "/auth/twitter/callback"
   },
 };
 
 export const authOptions = {
     facebook: { scope: ['email', 'user_location'], session: false },
-    twitter: { scope: [], session: false },
+    twitter: { scope: [], session: true },
     google: {
         scope: [
             'https://www.googleapis.com/auth/plus.login',

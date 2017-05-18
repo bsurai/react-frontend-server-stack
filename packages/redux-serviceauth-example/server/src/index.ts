@@ -2,6 +2,7 @@ import * as bodyParser from "body-parser";
 import * as cookieParser from "cookie-parser";
 import * as core from "express-serve-static-core";
 import * as Express from "express";
+import * as expressSession from "express-session";
 import * as path from "path";
 import * as cors from "cors";
 import auth from "./auth";
@@ -11,30 +12,36 @@ let { PORT_SERVER, PORT_CLIENT } = ports;
 const app: Express.Application = Express();
 const optionsUrlencoded: bodyParser.OptionsUrlencoded = { extended: false };
 
-app.use('*', cors({ origin: 'http://localhost:'+PORT_CLIENT, credentials: true }));
+app.use('*', cors({ origin: 'http://localhost:' + PORT_CLIENT, credentials: true }));
 
 app.use(cookieParser());
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
+app.use(expressSession({
+    secret: 'keyboard cat',
+    resave: false,
+    saveUninitialized: true,
+    // cookie: { secure: true }
+}));
 
 auth.set(app);
 
 app.use((err, req, res, next) => {
     console.log('500 Internal Server Error: ' + err.message);
-    console.log('url='+req.url)
-    console.log('baseUrl='+req.baseUrl);
+    console.log('url=' + req.url)
+    console.log('baseUrl=' + req.baseUrl);
     res.send('500 Internal Server Error');
 });
 
 app.use((req, res) => {
     console.log('404 Not Found');
-    console.log('url='+req.url)
-    console.log('baseUrl='+req.baseUrl);
+    console.log('url=' + req.url)
+    console.log('baseUrl=' + req.baseUrl);
     res.send('404 Not Found');
 });
 
 let port = process.env.PORT || PORT_SERVER;
 app.listen(port, () => {
-    
+
     console.log("Running port " + port);
 });
