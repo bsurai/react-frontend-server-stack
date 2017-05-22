@@ -9,10 +9,6 @@ export interface CounterProps {
 
 class Counter extends React.Component<CounterProps, any> {
     public render() {
-
-        console.log("Counter")
-        console.log(this.props.incrementAsync)
-
         return (
             <div>
                 <div className="count">

@@ -3,7 +3,7 @@ import * as expressJwt from "express-jwt";
 import * as jwt from "jsonwebtoken";
 import passport from "./passport";
 import ports from "../constants/ports";
-import { auth, authOptions, authCallbackOptions } from './config';
+import { strategyOptions, authOptions, authCallbackOptions } from './config';
 import { user as mockUser } from './mockData';
 
 const { PORT_SERVER, PORT_CLIENT } = ports;
@@ -15,26 +15,28 @@ const authCall = (req, res, next) => {
 };
 
 const authCallback = (req, res, next) => {
+    console.log("authCallback")
     let { provider } = req.params;
     passport.authenticate(provider, authCallbackOptions[provider])(req, res, next);
 };
 
 const createToken = (req: Express.Request, res: Express.Response): Express.Response => {
     const expiresIn = 60 * 5; // 5 mins
-    const token = jwt.sign(req.user, auth.jwt.secret, { expiresIn });
-    res.cookie('id_token', token, { maxAge: 1000 * expiresIn, httpOnly: true });
+    const token = jwt.sign(req.user, strategyOptions.jwt.secret, { expiresIn });
+    res.cookie('id_token', token, { maxAge: 1000 * expiresIn, httpOnly: true, signed: true });
     return res;
 };
 
 const sendTokenAfterSucceed: Express.Handler = (req, res) => {
+    console.log("sendTokenAfterSucceed")
     createToken(req, res).redirect('http://localhost:' + PORT_CLIENT + '/repos');
 };
 
 const jwtWithOptions = expressJwt({
-    secret: auth.jwt.secret,
+    secret: strategyOptions.jwt.secret,
     credentialsRequired: false,
     getToken: (req) => {
-        return req.cookies.id_token
+        return req.signedCookies.id_token
     },
 });
 
@@ -54,6 +56,7 @@ const authLoginCallback: Express.Handler = (req, res, next): void => {
 const set = (app: Express.Application): void => {
     app.use('/auth/login', jwtWithOptions, authLoginCallback);
     app.use(passport.initialize());
+    app.use(passport.session());
     app.get('/auth/:provider', authCall);
     app.get('/auth/:provider/callback', authCallback, sendTokenAfterSucceed);
 };

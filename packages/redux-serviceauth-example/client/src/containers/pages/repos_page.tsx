@@ -21,10 +21,6 @@ function mapDispatchToPropsReposPage(dispatch: Redux.Dispatch<any>) {
 @serviceAuth.decorator()
 class ReposPage extends React.Component<any, any> {
     public render() {
-
-        console.log(" ReposPage this.props")
-        console.log(this.props)
-
         let label = "Loading...";
         if (this.props.repos !== undefined && this.props.repos.loading === false) {
             label = this.props.repos.reposCount;

@@ -15,7 +15,7 @@ class ServiceButtons extends React.Component<any, any> {
     }
 };
 
-export class Wrapped extends React.Component<any, any> {
+/* export class Wrapped extends React.Component<any, any> {
 
     componentDidMount() {
         const { actionsAuth } = this.props;
@@ -24,22 +24,43 @@ export class Wrapped extends React.Component<any, any> {
 
     public render() {
         const { authentication: { isAuthenticated } } = this.props;
-        console.log("render isAuthenticated = "+isAuthenticated);
+        console.log("render isAuthenticated = " + isAuthenticated);
 
         return (
             <div>{
                 isAuthenticated ?
                     <DefaultComponent {...this.props} /> :
-                    <ServiceButtons />
+                    <ul>{
+                        providers.buttons.map(
+                            (btn, ind) => <li key={ind}><btn.component name={btn.name} /></li>
+                        )
+                    }</ul>
             }</div>
         )
     }
-};
+};*/
 
 const decorator = () => {
     return (_defaultComponent: any) => {
-        DefaultComponent = _defaultComponent;
-        return Wrapped;
+        let DefaultComponent = _defaultComponent;
+        return React.createClass({
+            componentDidMount() {
+                const { actionsAuth } = this.props;
+                actionsAuth.fetchLogin();
+            },
+            render() {
+                const { authentication: { isAuthenticated } } = this.props;
+                console.log("render isAuthenticated = " + isAuthenticated);
+
+                return (
+                    <div>{
+                        isAuthenticated ?
+                            <DefaultComponent {...this.props} /> :
+                            <ServiceButtons />
+                    }</div>
+                )
+            }
+        });;
     };
 };
 

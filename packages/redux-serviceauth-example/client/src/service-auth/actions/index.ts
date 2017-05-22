@@ -32,6 +32,8 @@ const loginError: I.IActionCreatorSync = () => {
 const fetchLogin = () => ({ dispatch }) => {//(service: string) => {
 
     return (dispatch) => {
+        console.log('fetchLogin')
+        
         let options = {
             method: 'GET',
             headers: {

@@ -6,6 +6,7 @@ import * as expressSession from "express-session";
 import * as path from "path";
 import * as cors from "cors";
 import auth from "./auth";
+import { strategyOptions } from './auth/config';
 import ports from "./constants/ports";
 
 let { PORT_SERVER, PORT_CLIENT } = ports;
@@ -14,11 +15,11 @@ const optionsUrlencoded: bodyParser.OptionsUrlencoded = { extended: false };
 
 app.use('*', cors({ origin: 'http://localhost:' + PORT_CLIENT, credentials: true }));
 
-app.use(cookieParser());
+app.use(cookieParser(strategyOptions.cookie.secret));
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 app.use(expressSession({
-    secret: 'keyboard cat',
+    secret: strategyOptions.session.secret,
     resave: false,
     saveUninitialized: true,
     // cookie: { secure: true }
