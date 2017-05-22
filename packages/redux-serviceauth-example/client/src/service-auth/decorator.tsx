@@ -1,4 +1,5 @@
 import * as React from "react";
+import * as createReactClass from "create-react-class";
 import providers from "./components";
 
 let DefaultComponent: any;
@@ -43,7 +44,7 @@ class ServiceButtons extends React.Component<any, any> {
 const decorator = () => {
     return (_defaultComponent: any) => {
         let DefaultComponent = _defaultComponent;
-        return React.createClass({
+        return createReactClass({
             componentDidMount() {
                 const { actionsAuth } = this.props;
                 actionsAuth.fetchLogin();
